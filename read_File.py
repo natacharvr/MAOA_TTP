@@ -1,4 +1,8 @@
-def realFile(fileName) :
+import math
+
+def readFile(fileName) :
+    # returns titre, capacity, min_speed, max_speed, cities
+    # cities is a dictionary xhere an entry  is key (int) : [(pos_x, pos_y), [(index, profit, weight), ...]]
     file = open(fileName, "r")
 
     lines = file.readlines()
@@ -21,6 +25,15 @@ def realFile(fileName) :
         a,b,c,d = lines[i].split()
         item = ((int)(a),(int)(b),(int)(c))
         cities[(int)(d)][1].append(item)
-        print(cities[(int)(d)])
+        # print(cities[(int)(d)])
+    return titre, capacity, min_speed, max_speed, cities
 
-realFile("a280_n279_bounded-strongly-corr_01.txt")
+_, _, _, _, cities = readFile("a280_n279_bounded-strongly-corr_01.txt")
+
+def calculate_distance(cityA, cityB, cities) :
+    posxA, posyA = cities[cityA][0]
+    posxB, posyB = cities[cityB][0]
+    print(posxA, posyA, posxB, posyB)
+    return math.sqrt((posxB -posxA)**2 + (posyB - posyA)**2)
+
+# print(calculate_distance(1,3, cities))
