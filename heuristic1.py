@@ -26,5 +26,35 @@ def select_items(cities, capacity) :
         if fill + weight < capacity :
             selected_objects.append((index, weight, cityKey))
 
+def distances_to_city(cityA, cities) :
+    distances = dict()
+    for city, _ in cities.items() :
+        distances[city] = utils.calculate_distance(cityA, city, cities)
+    return distances
 
-print(order_objects(cities))
+def closest_city(cityA, cities) :
+    if len(cities) == 1 :
+        return
+    distances = distances_to_city(cityA, cities)
+    distances.pop(cityA)
+    return min(distances.items(), key=lambda x: x[1])
+
+def tour(cities) :
+    # calculates a tour tha goes from one city to its closest non explored city
+    tour = [1]
+    cities_cpy = cities.copy()
+    current_city = 1
+    tour_length = 0
+
+    while len(cities_cpy) > 1 :
+        next_city = closest_city(current_city, cities_cpy)
+        cities_cpy.pop(current_city)
+        tour.append(next_city[0])
+        tour_length += next_city[1]
+        current_city = next_city[0]
+    return tour, tour_length
+
+
+print(tour(cities))
+
+# print(order_objects(cities))

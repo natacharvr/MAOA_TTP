@@ -33,7 +33,7 @@ _, _, _, _, cities = readFile("a280_n279_bounded-strongly-corr_01.txt")
 def calculate_distance(cityA, cityB, cities) :
     posxA, posyA = cities[cityA][0]
     posxB, posyB = cities[cityB][0]
-    print(posxA, posyA, posxB, posyB)
+    #print(posxA, posyA, posxB, posyB)
     return math.sqrt((posxB -posxA)**2 + (posyB - posyA)**2)
 
 # print(calculate_distance(1,3, cities))
