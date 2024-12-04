@@ -45,3 +45,9 @@ def calculate_value_ratio(object):
 
 def sortSecond(val):
         return val[1]
+
+def objective_funtion_linear(cities, knapsack_content) :
+    first_term = 0
+    for item in knapsack_content :
+          first_term += item[1]
+    

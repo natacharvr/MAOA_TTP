@@ -22,9 +22,10 @@ def select_items(cities, capacity) :
     objects = order_objects(cities)
     selected_objects = []
     fill = 0
-    for index, _, weight, cityKey in objects :
+    for index, profit, weight, cityKey in objects :
         if fill + weight < capacity :
-            selected_objects.append((index, weight, cityKey))
+            selected_objects.append((index, profit, weight, cityKey))
+    return selected_objects
 
 def distances_to_city(cityA, cities) :
     distances = dict()
@@ -52,8 +53,12 @@ def tour(cities) :
         tour.append(next_city[0])
         tour_length += next_city[1]
         current_city = next_city[0]
+
+    tour_length += utils.calculate_distance(tour[1], tour[-1], cities)
     return tour, tour_length
 
+def tour_with_knapsack():
+    pass
 
 print(tour(cities))
 
