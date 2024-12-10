@@ -46,8 +46,19 @@ def calculate_value_ratio(object):
 def sortSecond(val):
         return val[1]
 
-def objective_funtion_linear(cities, knapsack_content) :
+def objective_funtion_linear(cities, knapsack_content, K, tour) : 
+    # knapsack_content is a list of tuples (index, profit, weight, cityKey)
     first_term = 0
     for item in knapsack_content :
           first_term += item[1]
     
+    dist = 0
+    weight = 0
+    for i in range(len(tour)) :
+         for item in knapsack_content:
+              if item[3] == tour[i] :
+                   weight += item[2] 
+         dist += calculate_distance(tour[i], tour[i+1]) * weight
+    second_term = calculate_distance(tour[0], tour[-1]) * weight
+
+    return first_term - K * second_term
