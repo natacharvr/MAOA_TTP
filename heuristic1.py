@@ -4,7 +4,7 @@ import copy
 # take most objects with high ratio
 # create a tour with the cities of the objects at the end of the tour
 # order cities "de propche en proche" with objects at the end
-titre, capacity, min_speed, max_speed, cities = utils.readFile("a280_n279_bounded-strongly-corr_01.txt")
+titre, capacity, min_speed, max_speed, cities = utils.readFile("a280_n1395_uncorr-similar-weights_05.txt")
 
 
 def order_objects(cities) :
@@ -25,6 +25,7 @@ def select_items(cities, capacity) :
     for index, profit, weight, cityKey in objects :
         if fill + weight < capacity :
             selected_objects.append((index, profit, weight, cityKey))
+            fill += weight
     return selected_objects
 
 def distances_to_city(cityA, cities) :
@@ -66,30 +67,16 @@ def tour_with_knapsack(cities, capacity):
     for a in cities :
         if a not in cities_with_object :
             c[a] = cities[a]
-    # print(type(c))
 
     t, tour_length = tour(c, 1)
+
     last = t[-1]
     cities_with_object[last] = cities[last]
-    init = closest_city(last, cities_with_object)[0]
     t1, tour_length1 = tour(cities_with_object, last)
 
-    t+=t1
-    tour_length += tour_length1 + utils.calculate_distance(last, init, cities)
-    return t, tour_length
-# problem problem problem TODO
+    t+=t1[1:]
+    tour_length += tour_length1
+    return t, selected_objects
 
-t, _ = tour_with_knapsack(cities, capacity)
-t1, _ = tour(cities, 1)
-
-t = t[1:]
-print(t)
-print(t1)
-diff = 0
-for i in range(len(t1)) :
-    if t[i] != t1[i]:
-        diff += 1
-    else :
-        print(i)
-print("diff ", diff)
-# print(order_objects(cities))
+t, objects = tour_with_knapsack(cities, capacity)
+print(utils.objective_funtion_linear(cities, objects, 1, t))

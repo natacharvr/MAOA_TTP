@@ -37,7 +37,7 @@ def calculate_distance(cityA, cityB, cities) :
     #print(posxA, posyA, posxB, posyB)
     return math.sqrt((posxB -posxA)**2 + (posyB - posyA)**2)
 
-# print(calculate_distance(1,1, cities))
+# print(calculate_distance(125,124, cities))
 
 def calculate_value_ratio(object):
     profit = object[1]
@@ -47,7 +47,7 @@ def calculate_value_ratio(object):
 def sortSecond(val):
         return val[1]
 
-def objective_funtion_linear(knapsack_content, K, tour) : 
+def objective_funtion_linear(cities, knapsack_content, K, tour) : 
     # knapsack_content is a list of tuples (index, profit, weight, cityKey)
     # tour is a list of the idex of the cities
     first_term = 0
@@ -56,11 +56,11 @@ def objective_funtion_linear(knapsack_content, K, tour) :
     
     dist = 0
     weight = 0
-    for i in range(len(tour)) :
-         for item in knapsack_content:
-              if item[3] == tour[i] :
-                   weight += item[2] 
-         dist += calculate_distance(tour[i], tour[i+1]) * weight
-    second_term = calculate_distance(tour[0], tour[-1]) * weight
+    for i in range(len(tour)-1) :
+        for item in knapsack_content:
+            if item[3] == tour[i] :
+                weight += item[2] 
+        dist += calculate_distance(tour[i], tour[i+1], cities) * weight
+    second_term = calculate_distance(tour[0], tour[-1], cities) * weight
 
     return first_term - K * second_term
