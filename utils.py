@@ -31,12 +31,13 @@ def readFile(fileName) :
 _, _, _, _, cities = readFile("a280_n279_bounded-strongly-corr_01.txt")
 
 def calculate_distance(cityA, cityB, cities) :
+    # print("cities", cities)
     posxA, posyA = cities[cityA][0]
     posxB, posyB = cities[cityB][0]
     #print(posxA, posyA, posxB, posyB)
     return math.sqrt((posxB -posxA)**2 + (posyB - posyA)**2)
 
-# print(calculate_distance(1,3, cities))
+# print(calculate_distance(1,1, cities))
 
 def calculate_value_ratio(object):
     profit = object[1]
@@ -46,8 +47,9 @@ def calculate_value_ratio(object):
 def sortSecond(val):
         return val[1]
 
-def objective_funtion_linear(cities, knapsack_content, K, tour) : 
+def objective_funtion_linear(knapsack_content, K, tour) : 
     # knapsack_content is a list of tuples (index, profit, weight, cityKey)
+    # tour is a list of the idex of the cities
     first_term = 0
     for item in knapsack_content :
           first_term += item[1]
