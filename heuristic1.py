@@ -4,6 +4,7 @@ import copy
 # take most objects with high ratio
 # create a tour with the cities of the objects at the end of the tour
 # order cities "de propche en proche" with objects at the end
+# titre, capacity, min_speed, max_speed, cities = utils.readFile("a280_n279_bounded-strongly-corr_01.txt")
 titre, capacity, min_speed, max_speed, cities = utils.readFile("a280_n1395_uncorr-similar-weights_05.txt")
 
 
@@ -78,5 +79,13 @@ def tour_with_knapsack(cities, capacity):
     tour_length += tour_length1
     return t, selected_objects
 
+# with our idea
 t, objects = tour_with_knapsack(cities, capacity)
 print(utils.objective_funtion_linear(cities, objects, 1, t))
+
+# without our idea
+t = tour(cities, 1)[0]
+objects = select_items(cities, capacity)
+
+print(utils.objective_funtion_linear(cities, objects, 1, t))
+# without our idea is much better :(
