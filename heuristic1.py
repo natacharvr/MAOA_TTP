@@ -5,7 +5,7 @@ import copy
 # create a tour with the cities of the objects at the end of the tour
 # order cities "de propche en proche" with objects at the end
 # titre, capacity, min_speed, max_speed, cities = utils.readFile("a280_n279_bounded-strongly-corr_01.txt")
-titre, capacity, min_speed, max_speed, cities = utils.readFile("a280_n1395_uncorr-similar-weights_05.txt")
+# titre, capacity, min_speed, max_speed, cities = utils.readFile("a280_n1395_uncorr-similar-weights_05.txt")
 
 
 def order_objects(cities) :
@@ -80,12 +80,15 @@ def tour_with_knapsack(cities, capacity):
     return t, selected_objects
 
 # with our idea
-t, objects = tour_with_knapsack(cities, capacity)
-print(utils.objective_function_non_linear(cities, objects, 1, t, max_speed, min_speed, capacity))
+# t, objects = tour_with_knapsack(cities, capacity)
+# print(utils.objective_function_non_linear(cities, objects, 1, t, max_speed, min_speed, capacity))
 
-# without our idea
-t = tour(cities, 1)[0]
-objects = select_items(cities, capacity)
+# # without our idea
+# t = tour(cities, 1)[0]
+# objects = select_items(cities, capacity)
 
-print(utils.objective_function_non_linear(cities, objects, 1, t, max_speed, min_speed, capacity))
+# print(utils.objective_function_non_linear(cities, objects, 1, t, max_speed, min_speed, capacity))
 # without our idea is much better :(
+
+
+# idée d'heuristique : on fait un bon tour, et on prend le maximum d'objets venant des derniers sommets du tour
