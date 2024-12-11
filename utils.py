@@ -47,20 +47,36 @@ def calculate_value_ratio(object):
 def sortSecond(val):
         return val[1]
 
-def objective_funtion_linear(cities, knapsack_content, K, tour) : 
+def objective_function_linear(cities, knapsack_content, K, tour) : 
     # knapsack_content is a list of tuples (index, profit, weight, cityKey)
     # tour is a list of the idex of the cities
     first_term = 0
     for item in knapsack_content :
           first_term += item[1]
     
-    dist = 0
+    second_term = 0
     weight = 0
     for i in range(len(tour)-1) :
         for item in knapsack_content:
             if item[3] == tour[i] :
                 weight += item[2] 
-        dist += calculate_distance(tour[i], tour[i+1], cities) * weight
-    second_term = calculate_distance(tour[0], tour[-1], cities) * weight
+        second_term += calculate_distance(tour[i], tour[i+1], cities) * weight
+    second_term += calculate_distance(tour[0], tour[-1], cities) * weight
 
     return first_term - K * second_term
+
+def objective_function_non_linear(cities, knapsack_content, R, tour, vmax, vmin, capacity) :
+    first_term = 0
+    for item in knapsack_content :
+          first_term += item[1]
+
+    v = (vmax - vmin) / capacity
+    second_term = 0
+    weight = 0
+    for i in range(len(tour)-1) :
+        for item in knapsack_content:
+            if item[3] == tour[i] :
+                weight += item[2] 
+        second_term += calculate_distance(tour[i], tour[i+1], cities) / (vmax - v * weight)
+    second_term += calculate_distance(tour[0], tour[-1], cities) / (vmax - (v * weight))
+    return first_term - R * second_term

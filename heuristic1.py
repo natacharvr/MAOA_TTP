@@ -81,11 +81,11 @@ def tour_with_knapsack(cities, capacity):
 
 # with our idea
 t, objects = tour_with_knapsack(cities, capacity)
-print(utils.objective_funtion_linear(cities, objects, 1, t))
+print(utils.objective_function_non_linear(cities, objects, 1, t, max_speed, min_speed, capacity))
 
 # without our idea
 t = tour(cities, 1)[0]
 objects = select_items(cities, capacity)
 
-print(utils.objective_funtion_linear(cities, objects, 1, t))
+print(utils.objective_function_non_linear(cities, objects, 1, t, max_speed, min_speed, capacity))
 # without our idea is much better :(
