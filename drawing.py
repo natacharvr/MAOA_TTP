@@ -53,9 +53,9 @@ def make_visu(cities, tour, filename):
     cv2.waitKey(0) 
     cv2.destroyAllWindows() 
 # filename = "a280_n1395_uncorr-similar-weights_05"
-# titre, capacity, min_speed, max_speed, cities = utils.readFile(filename+".txt")
+# titre, capacity, min_speed, max_speed, renting_ratio, cities = utils.readFile(filename+".txt")
 # tour = heuristic1.tour_with_knapsack(cities, capacity)[0]
 
 # make_visu(cities, tour, filename+".jpg")
-# tour = heuristic1.tour(cities, 1)[0]
+# tour = heuristic1.tour(cities, renting_ratio)[0]
 # make_visu(cities, tour, filename+"2.jpg")

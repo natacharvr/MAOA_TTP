@@ -14,6 +14,7 @@ def readFile(fileName) :
     nb_items = (int)(lines[3].split()[3])
     min_speed = (float)(lines[5].split()[2])
     max_speed = (float)(lines[6].split()[2])
+    renting_ratio = (float)(lines[7].split()[2])
 
     cities = dict()
     for i in range(10, nb_cities+10, 1) :
@@ -26,9 +27,9 @@ def readFile(fileName) :
         item = ((int)(a),(int)(b),(int)(c))
         cities[(int)(d)][1].append(item)
         # print(cities[(int)(d)])
-    return titre, capacity, min_speed, max_speed, cities
+    return titre, capacity, min_speed, max_speed, renting_ratio, cities
 
-_, _, _, _, cities = readFile("a280_n279_bounded-strongly-corr_01.txt")
+_, _, _, _, _, cities = readFile("a280_n279_bounded-strongly-corr_01.txt")
 
 def calculate_distance(cityA, cityB, cities) :
     # print("cities", cities)
