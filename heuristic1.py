@@ -43,7 +43,7 @@ def closest_city(cityA, cities) :
     return min(distances.items(), key=lambda x: x[1])
 
 def tour(cities, init) :
-    # calculates a tour tha goes from one city to its closest non explored city
+    # calculates a tour that goes from one city to its closest non explored city
     tour = [init]
     cities_cpy = copy.deepcopy(cities)
     current_city = init
@@ -79,6 +79,47 @@ def tour_with_knapsack(cities, capacity):
     tour_length += tour_length1
     return t, selected_objects
 
+def tour_and_len(cities, init) :
+    # calculates a tour that goes from one city to its closest non explored city
+    tour = [init]
+    cities_cpy = copy.deepcopy(cities)
+    current_city = init
+    tour_length = 0
+
+    while len(cities_cpy) > 1 :
+        next_city = closest_city(current_city, cities_cpy)
+        cities_cpy.pop(current_city)
+        if current_city == init:
+            tour[0] = (current_city, utils.calculate_distance(current_city, next_city[0], cities))
+        else:
+            tour.append(next_city)
+        tour_length += next_city[1]
+        current_city = next_city[0]
+    firstcity,_ = tour[0]
+    lastcity, _ = tour[-1]
+    tour_length += utils.calculate_distance(firstcity, lastcity, cities)
+    return tour, tour_length
+
+def tour_and_len_with_knapsack(cities, capacity):
+    selected_objects = select_items(cities, capacity)
+    cities_with_object = dict()
+    for item in selected_objects :
+        cities_with_object[item[3]] = cities[item[3]]
+
+    c = dict()
+    for a in cities :
+        if a not in cities_with_object :
+            c[a] = cities[a]
+
+    t, tour_length = tour_and_len(c, 1)
+
+    last, _ = t[-1]
+    cities_with_object[last] = cities[last]
+    t1, tour_length1 = tour_and_len(cities_with_object, last)
+
+    t+=t1[1:]
+    tour_length += tour_length1
+    return t, selected_objects
 # with our idea
 # t, objects = tour_with_knapsack(cities, capacity)
 # print(utils.objective_function_linear(cities, objects, renting_ratio, t))#, max_speed, min_speed, capacity))
