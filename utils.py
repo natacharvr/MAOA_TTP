@@ -1,6 +1,7 @@
 import math
 
 def readFile(fileName) :
+    # reads from fileName
     # returns titre, capacity, min_speed, max_speed, cities
     # cities is a dictionary xhere an entry  is key (int) : [(pos_x, pos_y), [(index, profit, weight), ...]]
     file = open(fileName, "r")
@@ -32,7 +33,9 @@ def readFile(fileName) :
 _, _, _, _, _, cities = readFile("a280_n279_bounded-strongly-corr_01.txt")
 
 def calculate_distance(cityA, cityB, cities) :
+    # a simple function to calculate the distance from cityA to cityB (the index of the cities)
     # print("cities", cities)
+    if cityA == cityB : return 0
     posxA, posyA = cities[cityA][0]
     posxB, posyB = cities[cityB][0]
     #print(posxA, posyA, posxB, posyB)

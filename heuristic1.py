@@ -4,11 +4,13 @@ import copy
 # take most objects with high ratio
 # create a tour with the cities of the objects at the end of the tour
 # order cities "de propche en proche" with objects at the end
-titre, capacity, min_speed, max_speed, renting_ratio, cities = utils.readFile("a280_n279_bounded-strongly-corr_01.txt")
+titre, capacity, min_speed, max_speed, renting_ratio, cities = utils.readFile("fnl4461_n4460_bounded-strongly-corr_01.txt")
 # titre, capacity, min_speed, max_speed, renting_ratio, cities = utils.readFile("a280_n1395_uncorr-similar-weights_05.txt")
 
 
 def order_objects(cities) :
+    # orders objects by their ratio value/weight
+    # returns a list of tuples (index, ratio, weight, cityKey)
     objects = []
 
     for key, value in cities.items() :
@@ -20,6 +22,8 @@ def order_objects(cities) :
     return objects
 
 def select_items(cities, capacity) :
+    # selects objects by their ratio value/weight, the most interesting objects first, and takes the most objects possible
+    # it only takes an object if it fits in the knapsack
     objects = order_objects(cities)
     selected_objects = []
     fill = 0
@@ -30,6 +34,7 @@ def select_items(cities, capacity) :
     return selected_objects
 
 def distances_to_city(cityA, cities) :
+    # returns a dictionnary of the distances from cityA to all the other cities
     distances = dict()
     for city, _ in cities.items() :
         distances[city] = utils.calculate_distance(cityA, city, cities)
@@ -120,6 +125,8 @@ def tour_and_len_with_knapsack(cities, capacity):
     t+=t1[1:]
     tour_length += tour_length1
     return t, selected_objects
+
+
 # with our idea
 # t, objects = tour_with_knapsack(cities, capacity)
 # print(utils.objective_function_linear(cities, objects, renting_ratio, t))#, max_speed, min_speed, capacity))
@@ -129,6 +136,6 @@ def tour_and_len_with_knapsack(cities, capacity):
 # objects = select_items(cities, capacity)
 
 # print(utils.objective_function_linear(cities, objects, renting_ratio, t))#, max_speed, min_speed, capacity))
-
+print(tour(cities,1)[1])
 
 # idée d'heuristique : on fait un bon tour, et on prend le maximum d'objets venant des derniers sommets du tour 

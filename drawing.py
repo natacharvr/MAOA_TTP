@@ -5,6 +5,7 @@ import cv2
 import math
 
 def min_max_pos(cities) :
+    # used to calculate the size of the window for display
     max_x = 0
     max_y = 0
     min_x = math.inf
@@ -17,17 +18,22 @@ def min_max_pos(cities) :
     return(min_x, min_y, max_x, max_y)
 
 def make_visu(cities, tour, filename):
+    # draws the cities and the tour in filename
+
+    # get the dimensions of the needed window
     min_x, min_y, max_x, max_y = min_max_pos(cities)
     size_x = max_x - min_x
     size_y = max_y - min_y
     img = np.zeros(((size_y + 50), (size_x + 50), 3), dtype = "uint8") 
+
+    # draws a circle for eah city on the image
     for city, values in cities.items() :
         coord_x, coord_y = values[0]
         coord_x -= min_x
         coord_y -= min_y
         cv2.circle(img, (coord_x, coord_y), 1, (255, 255, 255), 2) 
 
-
+    # draws the tour
     for i in range(len(tour)-1) :
         coord_x, coord_y = cities[tour[i]][0]
         coord_x2, coord_y2 = cities[tour[i+1]][0]
@@ -36,6 +42,8 @@ def make_visu(cities, tour, filename):
         coord_y -= min_y
         coord_y2 -= min_y
         cv2.line(img,(coord_x, coord_y), (coord_x2, coord_y2), (255,i%255,i%255), 2)
+
+    # add a line between the startpoint and endpoint
     coord_x, coord_y = cities[tour[0]][0]
     coord_x2, coord_y2 = cities[tour[-1]][0]
     coord_x -= min_x
