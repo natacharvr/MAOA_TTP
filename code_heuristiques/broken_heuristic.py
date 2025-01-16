@@ -1,32 +1,36 @@
 import math 
-import utils
+import code_heuristiques.utils as utils
+import time
 
 def calculate_matrix(cities) :
     matrix = [[math.inf for _ in range(len(cities)+1)] for _ in range(len(cities)+1)]
 
     # every city is in a group (to avoid building tours that do not contain every city)
     matrix[0][0] = ("", 0) # an empty cell at the top left corner
+    city_groups = dict()
     for i in range(1, len(cities)+1) :
         # the title of a line/column is a tuple of the name of the city and the group in which it is 
-        matrix[i][0] = (i,0) # title of row (city index starts at 0)
-        matrix[0][i] = (i,0) # title of column
+        matrix[i][0] = i # title of row (city index starts at 1)
+        matrix[0][i] = i # title of column
+        city_groups[i] = 0
+
     
     for i in range(1, len(cities)+1) :
         for j in range(i, len(cities)+1):
             d = utils.calculate_distance(i, j, cities)
             matrix[i][j] = d
             matrix[j][i] = d
-    return matrix
+    return matrix, city_groups
 
 def remove_line(matrix, line_name):
     # Find the row index to remove
-    row_index = next((i for i, row in enumerate(matrix) if row[0][0] == line_name), None)
+    row_index = next((i for i, row in enumerate(matrix) if row[0] == line_name), None)
     if row_index is not None:
         del matrix[row_index]
 
 def remove_column(matrix, column_name):
     # Find the column index to remove
-    column_index = next((i for i, title in enumerate(matrix[0]) if title[0] == column_name), None)
+    column_index = next((i for i, title in enumerate(matrix[0]) if title == column_name), None)
     if column_index is not None:
         for row in matrix:
             del row[column_index]
@@ -37,25 +41,13 @@ def print_matrix(matrix) :
     for row in matrix :
         print(row, '\n')
 
+def find_group(city_groups, city) :
+    return city_groups[city]
 
-def find_group(matrix, city) :
-    for row in matrix :
-        if row[0][0] == city: 
-            return row[0][1]
-    for line in matrix[0] :
-        if line[0] == city :
-            return line[1]
-    # print(matrix, city)
+def change_city_group(city_groups, city, group) :
+    city_groups[city] = group
 
-def change_city_group(matrix, city, group) :
-    for i in range(len(matrix)):
-        # Check if the first element of the tuple matches the city
-        if matrix[i][0][0] == city:
-            matrix[i][0] = (city, group)  # Update row title
-        if matrix[0][i][0] == city:
-            matrix[0][i] = (city, group)  # Update column title
-
-def merge_groups(matrix, group1, group2):
+def merge_groups(city_groups, group1, group2):
     """
     Merges two groups in the matrix by changing the group of all cities in the larger group
     to the group of the smaller one.
@@ -71,42 +63,46 @@ def merge_groups(matrix, group1, group2):
     else:
         smaller_group, larger_group = group1, group2
     
-    # Change all cities in the larger group to the smaller group
-    for i in range(1, len(matrix)):  # Start from 1 to skip the header row
-        if matrix[i][0][1] == larger_group:  # Check if the city belongs to the larger group
-            city = matrix[i][0][0]  # Get the city index
 
-            # Update the row
-            matrix[i][0] = (city, smaller_group)
+    for city, group in city_groups.items():
+        if group == larger_group:
+            city_groups[city] = smaller_group
+    # # Change all cities in the larger group to the smaller group
+    # for i in range(1, len(matrix)):  # Start from 1 to skip the header row
+    #     if matrix[i][0][1] == larger_group:  # Check if the city belongs to the larger group
+    #         city = matrix[i][0][0]  # Get the city index
 
-            # Update the column (first row)
-            for j in range(1, len(matrix[i])):  # Loop over columns
-                if matrix[0][j][0] == city:  # Find the city in the first row
-                    matrix[0][j] = (city, smaller_group)  # Change the city group in the header
+    #         # Update the row
+    #         matrix[i][0] = (city, smaller_group)
+
+    #         # Update the column (first row)
+    #         for j in range(1, len(matrix[i])):  # Loop over columns
+    #             if matrix[0][j][0] == city:  # Find the city in the first row
+    #                 matrix[0][j] = (city, smaller_group)  # Change the city group in the header
 
 
-def find_smallest_distance(matrix):
+def find_smallest_distance(matrix, city_groups):
     min_distance = math.inf
     min_position = (None, None)
 
     for i in range(1, len(matrix)):
-        for j in range(1, len(matrix[i])):
+        for j in range(i, len(matrix[i])):
             # Skip the diagonal elements where i == j (distance to itself)
             # if i != j:
-            if matrix[i][0][0] != matrix[0][j][0] : 
-                city_i_group = matrix[i][0][1]  # Extract the group of city i
-                city_j_group = matrix[0][j][1]  # Extract the group of city j
+            if matrix[i][0] != matrix[0][j] : 
+                city_i_group = city_groups[i]  # Extract the group of city i
+                city_j_group = city_groups[j]  # Extract the group of city j
 
                 # Skip pairs of cities in the same group (except group 0)
-                if city_i_group != city_j_group or city_i_group == 0:
+                if city_i_group != city_j_group or city_i_group == 0 :
                     if matrix[i][j] < min_distance:
                         min_distance = matrix[i][j]
                         # Access city names from the first row and first column
-                        min_position = (matrix[i][0][0], matrix[0][j][0])
+                        min_position = (matrix[i][0], matrix[0][j])
 
     return min_distance, min_position
 
-def build_path(matrix):
+def build_path(matrix, city_groups):
     int_group = 0
     path = []
     total_distance = 0
@@ -114,7 +110,9 @@ def build_path(matrix):
     while True:
         # print("heehe")
         # print_matrix(matrix)
-        min_distance, (city1, city2) = find_smallest_distance(matrix)
+        min_distance, (city1, city2) = find_smallest_distance(matrix, city_groups)
+        if (city1 == city2 == None) :
+            break
         # print(min_distance, (city1, city2))
         # if min_distance == math.inf :
         #     break
@@ -124,23 +122,24 @@ def build_path(matrix):
         total_distance += min_distance
         
         # Merge the two cities' groups
-        group1 = find_group(matrix, city1) # we add 1 to skip the headers
-        group2 = find_group(matrix, city2)
+        group1 = city_groups[city1] # we add 1 to skip the headers
+        group2 = city_groups[city2]
+
         # if one city is not in a group yet, we just add it to the group
         if group1 == 0 and group2 != 0 :
-            change_city_group(matrix, city1, group2)
+            city_groups[city1] = group2
         elif group2 == 0 and group1 != 0 : 
-            change_city_group(matrix, city2, group1)
+            city_groups[city2] = group1
 
         # if neither cities are in a group, we create a new group
         elif group1 == group2 == 0 :
             int_group += 1
-            change_city_group(matrix, city1, int_group)
-            change_city_group(matrix, city2, int_group)
+            city_groups[city1] = int_group
+            city_groups[city2] = int_group
 
         # if both cities are in different groups, we merge the groups
         else :
-            merge_groups(matrix, group1, group2)
+            merge_groups(city_groups, group1, group2)
         
         # Remove the row and column of the intersection (only once, theother intersection is forbidden by the groups)
         remove_line(matrix, city1)
@@ -223,9 +222,12 @@ def extract_tour_from_edges(edges):
 # print(build_path(matrix))
 titre, capacity, min_speed, max_speed, renting_ratio, cities = utils.readFile("fnl4461_n4460_bounded-strongly-corr_01.txt")
 
-matrix = calculate_matrix(cities)
-print("here")
+matrix, city_groups = calculate_matrix(cities)
 # print_matrix(matrix)
-edges, length = build_path(matrix)
+start = time.time()
+edges, length = build_path(matrix, city_groups)
+end = time.time()
+
+print("time spent : ", end - start)
 print(length)
 # print(extract_tour_from_edges(edges))
