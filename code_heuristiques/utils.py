@@ -33,7 +33,7 @@ def readFile(fileName) :
         # print(cities[(int)(d)])
     return titre, capacity, min_speed, max_speed, renting_ratio, cities
 
-_, _, _, _, _, cities = readFile("a280_n279_bounded-strongly-corr_01.txt")
+# _, _, _, _, _, cities = readFile("../datas/a280_n279_bounded-strongly-corr_01.txt")
 
 def calculate_distance(cityA, cityB, cities) :
     """
@@ -67,6 +67,7 @@ def objective_function_linear(cities, knapsack_content, K, tour) :
     first_term = 0
     for item in knapsack_content :
           first_term += item[1]
+    # print("value of knapsack content : ", first_term)
     
     second_term = 0
     weight = 0

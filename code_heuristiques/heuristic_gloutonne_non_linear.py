@@ -1,11 +1,11 @@
-import code_heuristiques.utils as utils 
+import utils 
 import copy
 import time
 # calculate ratio of items (value/weight), sort in ascending order
 # take most objects with high ratio
 # create a tour with the cities of the objects at the end of the tour
 # order cities "de propche en proche" with objects at the end
-titre, capacity, min_speed, max_speed, renting_ratio, cities = utils.readFile("fnl4461_n4460_bounded-strongly-corr_01.txt")
+titre, capacity, min_speed, max_speed, renting_ratio, cities = utils.readFile("datas/fnl4461_n4460_bounded-strongly-corr_01.txt")
 
 def order_objects(cities) :
     """
@@ -117,5 +117,5 @@ def tour_with_knapsack_non_linear(cities, capacity):
     return t, selected_objects
 
 
-t, objects = tour_with_knapsack_non_linear(cities, capacity)
-print(utils.objective_function_non_linear(cities, objects, renting_ratio, t, max_speed, min_speed, capacity))
+# t, objects = tour_with_knapsack_non_linear(cities, capacity)
+# print(utils.objective_function_non_linear(cities, objects, renting_ratio, t, max_speed, min_speed, capacity))

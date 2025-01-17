@@ -1,11 +1,12 @@
-import code_heuristiques.utils as utils
+import utils
 import random
 import time
 import heuristic_gloutonne_non_linear
+import matplotlib.pyplot as plt
 
 MAX_ITERATIONS = 10000
 
-titre, capacity, min_speed, max_speed, renting_ratio, cities = utils.readFile("fnl4461_n4460_bounded-strongly-corr_01.txt")
+titre, capacity, min_speed, max_speed, renting_ratio, cities = utils.readFile("datas/fnl4461_n4460_bounded-strongly-corr_01.txt")
 
 # we will try to optimize the tour rather than the knapsack
 
@@ -51,14 +52,14 @@ def optimize_tour(cities, knapsack_content, renting_ratio, tour, type="simple"):
             # if(type(tour[0]) == int):
             #     raise Exception("Give a list of cities with the distance to the next one")
             
-            valuation = utils.objective_function_linear(cities, knapsack_content, renting_ratio, tour)
+            valuation = utils.objective_function_linear(cities, knapsack_content, renting_ratio, [val for (val, _) in tour])
             log_valuation = [valuation]
             counter = 0
             best_tour = tour
             start = time.time()
             while (time.time() - start < 60) and counter < MAX_ITERATIONS : # TODO change here the timeoout
                 new_tour = randomize_longest_edge(tour, cities)
-                val = utils.objective_function_linear(cities, knapsack_content, renting_ratio, new_tour)
+                val = utils.objective_function_linear(cities, knapsack_content, renting_ratio, [val for (val,_) in new_tour])
                 
                 # only keep the change if it improves the solution
                 if val > valuation :
@@ -106,39 +107,38 @@ def randomize_longest_edge(tour, cities) :
     
     # on sort les edges en taille decroissante
     sorted_cities = sorted(tour,key=lambda city: city[1],reverse=True)
-    print(sorted_cities)
+    # print(sorted_cities)
     probas = [0.7, 0.3]
     for _ in range(10) :
         for i in range(1, nb_cities) :
                 # we swap two cities with probability of 1/n
                 proba = random.choices([0,1], probas)
                 if proba :
-                    city1,_ = sorted_cities[1]
+                    city1 = sorted_cities[1]
 
                     city2_index = random.randint(1,nb_cities-1)
                     city2 = tour[city2_index]
                     
                     # we swap the two cities
-                    tour[i] = city2
+                    tour[city1[0]] = city2
                     tour[city2_index] = city1
 
                     # we recalculate the length of the new edges selected
-                    tour[(i-1)%len(tour)][1] = utils.calculate_distance(tour[i][0], tour[(i-1)%len(tour)][0], cities)
-                    tour[i][1] = utils.calculate_distance(tour[i][0], tour[(i+1)%len(tour)][0], cities)
-                    tour[city2_index][1] = utils.calculate_distance(tour[city2_index][0], tour[(city2_index+1)%len(tour)][0], cities)
-                    tour[(city2_index-1)%len(tour)][1] = utils.calculate_distance(tour[city2_index][0], tour[(city2_index-1)%len(tour)][0], cities)
+                    tour[(i-1)%len(tour)] = (tour[(i-1)%len(tour)][0],utils.calculate_distance(tour[i][0], tour[(i-1)%len(tour)][0], cities))
+                    tour[i] = (tour[i][0], utils.calculate_distance(tour[i][0], tour[(i+1)%len(tour)][0], cities))
+                    tour[city2_index] = (tour[city2_index][0], utils.calculate_distance(tour[city2_index][0], tour[(city2_index+1)%len(tour)][0], cities))
+                    tour[(city2_index-1)%len(tour)] = (tour[(city2_index-1)%len(tour)][0], utils.calculate_distance(tour[city2_index][0], tour[(city2_index-1)%len(tour)][0], cities))
     return tour
 
 
-t, objects = heuristic_gloutonne_non_linear.tour_and_len_with_knapsack(cities, capacity)
-print(t)
+t, objects = heuristic_gloutonne_non_linear.tour_with_knapsack_non_linear(cities, capacity)
+# print(t)
 print("HERE \n")
-# randomize_longest_edge(t)
 
-# _,b = optimize_tour(cities, objects, renting_ratio, t)
-# plt.plot(b)
-# plt.show()
-# print(b)
+_,b = optimize_tour(cities, objects, renting_ratio, t, "with_length")
+plt.plot(b)
+plt.show()
+print(b)
 
 # other idea : we try to break the longest distance
 # we select (probably) the city wit the longest distance to travel and swap it with another city at random
