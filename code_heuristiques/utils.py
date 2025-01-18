@@ -89,7 +89,7 @@ def objective_function_non_linear(cities, knapsack_content, R, tour, vmax, vmin,
     """
     first_term = 0
     for item in knapsack_content :
-          first_term += item[1]
+        first_term += item[1]
 
     v = (vmax - vmin) / capacity
     second_term = 0
@@ -113,5 +113,5 @@ def calculate_tour_len(tour, cities) :
     for city in tour[1:] :
         len += calculate_distance(current_city, city, cities)
         current_city = city
-    len += calculate_tour_len(tour[0], tour[-1], cities)
+    len += calculate_distance(tour[0], tour[-1], cities)
     return len

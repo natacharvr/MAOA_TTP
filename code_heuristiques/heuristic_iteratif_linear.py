@@ -92,9 +92,7 @@ plt.plot(b)
 plt.show()
 print(b)
 f = open("output_iteratif_a280_n279_bounded-strongly-corr_01.txt", 'w')
-for value in b:
-    f.write(f"{value}\n")
-f.close()
+
 
 # other idea : we try to break the longest distance
 # we select (probably) the city wit the longest distance to travel and swap it with another city at random

@@ -1,6 +1,7 @@
 import utils 
 import copy
 import time
+import random
 # calculate ratio of items (value/weight), sort in ascending order
 # take most objects with high ratio
 # create a tour with the cities of the objects at the end of the tour
@@ -23,18 +24,38 @@ def order_objects(cities) :
     objects.sort(key=utils.sortSecond, reverse=True)
     return objects
 
-def select_items(cities, capacity) :
+def order_objects_end_of_tour(cities, tour) :
+    """
+    Orders objects by their ratio value/weight
+    returns a list of tuples (index, ratio, weight, cityKey)
+    cities is a dictionary where an entry  is key (int) : [(pos_x, pos_y), [(object_index, profit, weight), ...]]
+    """
+    objects = []
+
+    for key, value in cities.items() :
+        for o in value[1] :
+            ratio = utils.calculate_value_ratio(o) * tour.index(key)
+            objects.append((o[0], ratio, o[2], key)) # index, ratio, weight, cityKey
+    
+    objects.sort(key=utils.sortSecond, reverse=True)
+    return objects
+
+def select_items(cities, capacity, tour =[], proba=0) :
     """
     Selects objects by their ratio value/weight, the most interesting objects first, and takes the most objects possible
     it only takes an object if it fits in the knapsack
     cities is a dictionary where an entry  is key (int) : [(pos_x, pos_y), [(object_index, profit, weight), ...]]
     capacity (int) the maximum capacity of the knapsack
     """
-    objects = order_objects(cities)
+    if len(tour) > 0 :
+        objects = order_objects_end_of_tour(cities, tour)
+    else :
+        objects = order_objects(cities)
     selected_objects = []
     fill = 0
     for index, profit, weight, cityKey in objects :
-        if fill + weight < capacity :
+        choice = random.choices([0,1], [proba, 1-proba])[0]
+        if fill + weight < capacity and  choice: 
             selected_objects.append((index, profit, weight, cityKey))
             fill += weight
     return selected_objects
@@ -115,7 +136,6 @@ def tour_with_knapsack_non_linear(cities, capacity):
     t+=t1[1:]
     tour_length += tour_length1
     return t, selected_objects
-
 
 # t, objects = tour_with_knapsack_non_linear(cities, capacity)
 # print(utils.objective_function_non_linear(cities, objects, renting_ratio, t, max_speed, min_speed, capacity))
