@@ -2,9 +2,9 @@ import utils
 import random
 import time
 import heuristic_gloutonne_linear
-import matplotlib.pyplot as plt
-
+import json
 MAX_ITERATIONS = 10000
+MAX_TIME = 120
 FILENAME = "datas/a280_n279_bounded-strongly-corr_01.txt"
 titre, capacity, min_speed, max_speed, renting_ratio, cities = utils.readFile(FILENAME)
 
@@ -38,13 +38,14 @@ def optimize_tour(cities, renting_ratio):
     valuation = utils.objective_function_linear(cities, knapsack_content, renting_ratio, current_tour)
     log_valuation = [valuation]
 
-    #we timeout after 10 minutes or when the best value did not change in 10 000 iterations
+    #we timeout after MAX_TIME minutes or when the best value did not change in MAX_ITERATION iterations
     objects = heuristic_gloutonne_linear.order_objects_by_value_and_distance(cities, origin)
 
     counter = 0
     best_tour = current_tour
+    best_knapsack = knapsack_content
     start = time.time()
-    while (time.time() - start < 120) and counter < MAX_ITERATIONS : # TODO change here the timeoout
+    while (time.time() - start < MAX_TIME) and counter < MAX_ITERATIONS : # TODO change here the timeoout
         # TODO proba is okay ? When we have not moved in some time, we change more the knapsack proba
         new_tour, knapsack_content = randomize_tour_linear(cities, current_tour, capacity, objects, counter/MAX_ITERATIONS)
         val = utils.objective_function_linear(cities, knapsack_content, renting_ratio, new_tour)
@@ -54,10 +55,11 @@ def optimize_tour(cities, renting_ratio):
             valuation = val
             counter = 0
             best_tour = new_tour
+            best_knapsack = knapsack_content
         else : 
             counter += 1
         log_valuation.append(valuation)
-    return best_tour, log_valuation        
+    return best_tour, log_valuation, best_knapsack     
 
 def randomize_tour_linear(cities, current_tour, capacity, objects, proba) :
     """ 
@@ -87,21 +89,30 @@ def randomize_tour_linear(cities, current_tour, capacity, objects, proba) :
 # print(t)
 # print("HERE \n")
 # randomize_longest_edge(t)
-tour,b = optimize_tour(cities, renting_ratio)
-plt.plot(b)
-plt.show()
-print(b)
-f = open("output_iteratif_a280_n279_bounded-strongly-corr_01.txt", 'w')
+# tour,b = optimize_tour(cities, renting_ratio)
+# plt.plot(b)
+# plt.show()
+# print(b)
+# f = open("output_iteratif_a280_n279_bounded-strongly-corr_01.txt", 'w')
 
+filenames = ["a280_n279_bounded-strongly-corr_01", "a280_n1395_uncorr-similar-weights_05", "fnl4461_n4460_bounded-strongly-corr_01"]
 
-# other idea : we try to break the longest distance
-# we select (probably) the city wit the longest distance to travel and swap it with another city at random
-# we need to use a lisr of tuples with (origin, distance to travel) ordered, the we have only two distances to recalculate at each step
-# probleme de avec quoi relier (genre si on prends l'arete la plus grande, comment choisir quelle autre arete pour ameliorer?)
+for filename in filenames :
+    print(filename)
+    titre, capacity, min_speed, max_speed, renting_ratio, cities = utils.readFile("datas/"+filename+".txt")
 
-### INFOS SUPPLEMENTAIRES ###
-# Comment comparer (valeur finale, temps d'exec, prendre en compte que le truc de la competition est faite en java et non python)
-# visualisation des donnees au choix (villes, items, chemins) utiliser des tableaux et figures
-# commenter le code rajouter le lien vers le code dans le rapport
-# Ecrire les algos en pseudo-code et en anglais si on veut
-# rendu au plus tard le 20 janvier
+    b_log = []
+    for i in range(10) : 
+        print(i)
+        tour,b,knapsack = optimize_tour(cities, renting_ratio)
+        b_log.append(b)
+    # title = str(len(tour)) + " cities"
+    # b = []
+    # for i in range(max([len(item) for item in b_log])) :
+    #     temp =[b_log[j][i] for j in range(len(b_log)) if len(b_log[j]) > i]
+    #     b.append(sum(temp)/len(temp))
+
+    # plots.plot_valuation(b, title, filename+"_linear")
+    print(b_log)
+    with open(filename+"output.json", "w") as f:
+        json.dump(b_log, f)

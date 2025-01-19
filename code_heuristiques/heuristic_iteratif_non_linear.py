@@ -2,26 +2,24 @@ import utils
 import random
 import time
 import heuristic_gloutonne_non_linear
-import matplotlib.pyplot as plt
 
 MAX_ITERATIONS = 10000
 MAX_TIME = 120
 
-# titre, capacity, min_speed, max_speed, renting_ratio, cities = utils.readFile("datas/a280_n279_bounded-strongly-corr_01.txt")
-titre, capacity, min_speed, max_speed, renting_ratio, cities = utils.readFile("datas/a280_n1395_uncorr-similar-weights_05.txt")
-# titre, capacity, min_speed, max_speed, renting_ratio, cities = utils.readFile("images/fnl4461_n4460_bounded-strongly-corr_01.jpg")
-# titre, capacity, min_speed, max_speed, renting_ratio, cities = utils.readFile("datas/pla33810_n33809_bounded-strongly-corr_01.ttp.txt")
-
 # we will try to optimize the tour rather than the knapsack
 
-def optimize_tour(cities, knapsack_content, renting_ratio, tour, type="simple"):
+def optimize_tour(cities, renting_ratio, type="simple"):
     """
-    Tries to optimize the given tour with the given knapsack
-    There are two methods : simple and with length
+    Calculates a tour and knapsack with the glutton method and tries to optimize it
+    There are three methods : simple, with length and 2-opt
     simple : exchanges cities randomly and keeps the change if it improves the solution
     with length : finds the longest edge of the tour and exchanges with a random other city of the tour, only keeps the chaneg if it is better 
+    2-opt : iteratively improves the tour, and selects a knapsack interesting from the end of the tour. Keeps if change is better
     """
-    
+    # tour, _ = heuristic_gloutonne_non_linear.tour(cities, 1)
+    # knapsack_content = heuristic_gloutonne_non_linear.select_items(cities, capacity, tour)
+    tour, knapsack_content = heuristic_gloutonne_non_linear.tour_with_knapsack_non_linear(cities, capacity)
+
     #we timeout after 10 minutes or when the best value did not change in 10 000 iterations
     match type:
         case "simple":
@@ -43,7 +41,7 @@ def optimize_tour(cities, knapsack_content, renting_ratio, tour, type="simple"):
                 else : 
                     counter += 1
                 log_valuation.append(valuation)
-            return best_tour, log_valuation
+            return best_tour, log_valuation, knapsack_content
         
         # TODO can we exchange with closest neighbor ?
         case "with_length":
@@ -73,7 +71,7 @@ def optimize_tour(cities, knapsack_content, renting_ratio, tour, type="simple"):
                 else : 
                     counter += 1
                 log_valuation.append(valuation)
-            return best_tour, log_valuation
+            return best_tour, log_valuation, knapsack_content
          
         case "2-opt":
             best_tour_length = utils.calculate_tour_len(tour, cities)
@@ -107,7 +105,7 @@ def optimize_tour(cities, knapsack_content, renting_ratio, tour, type="simple"):
                 counter += 1
                 # print(counter)
                 log_valuation.append(valuation)
-            return best_tour, log_valuation
+            return best_tour, log_valuation, knapsack_content
 
 def randomize_tour(tour) :
     """ 
@@ -182,23 +180,31 @@ def two_opt_swap(tour, i, k):
                 return new_tour
 
 # t, objects = heuristic_gloutonne_non_linear.tour_with_knapsack_non_linear(cities, capacity)
-objects = heuristic_gloutonne_non_linear.select_items(cities, capacity)
-t, _ = heuristic_gloutonne_non_linear.tour(cities, 1)
+# objects = heuristic_gloutonne_non_linear.select_items(cities, capacity)
+# t, _ = heuristic_gloutonne_non_linear.tour(cities, 1)
 # print(t)
 
-_,b = optimize_tour(cities, objects, renting_ratio, t, "2-opt")
-plt.plot(b)
-plt.show()
-print(b)
 
-# other idea : we try to break the longest distance
-# we select (probably) the city wit the longest distance to travel and swap it with another city at random
-# we need to use a lisr of tuples with (origin, distance to travel) ordered, the we have only two distances to recalculate at each step
-# probleme de avec quoi relier (genre si on prends l'arete la plus grande, comment choisir quelle autre arete pour ameliorer?)
+import json
+filenames = ["a280_n279_bounded-strongly-corr_01", "a280_n1395_uncorr-similar-weights_05", "fnl4461_n4460_bounded-strongly-corr_01"]
 
-### INFOS SUPPLEMENTAIRES ###
-# Comment comparer (valeur finale, temps d'exec, prendre en compte que le truc de la competition est faite en java et non python)
-# visualisation des donnees au choix (villes, items, chemins) utiliser des tableaux et figures
-# commenter le code rajouter le lien vers le code dans le rapport
-# Ecrire les algos en pseudo-code et en anglais si on veut
-# rendu au plus tard le 20 janvier
+for filename in filenames :
+    print(filename)
+    titre, capacity, min_speed, max_speed, renting_ratio, cities = utils.readFile("datas/"+filename+".txt")
+
+    b_log = []
+    for i in range(10) : 
+        print(i)
+        tour,b,knapsack = optimize_tour(cities, renting_ratio, "2-opt")
+        b_log.append(b)
+    title = str(len(tour)) + " cities"
+    # b = []
+    # for i in range(max([len(item) for item in b_log])) :
+    #     temp =[b_log[j][i] for j in range(len(b_log)) if len(b_log[j]) > i]
+    #     b.append(sum(temp)/len(temp))
+
+    # plots.plot_valuation(b, title, filename+"test")
+    print(b_log)
+    with open(filename+"output.json", "w") as f:
+        json.dump(b_log, f)
+    
